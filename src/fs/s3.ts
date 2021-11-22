@@ -271,14 +271,14 @@ export class S3FileSystem extends vscrw_fs.FileSystemBase {
             )
         );
 
-        const AS_FULL_PATH = (p: string) => {
-            p = vscode_helpers.toStringSafe(p);
-            if (!Path.isAbsolute(p)) {
-                p = Path.join(AWS_DIR, p);
-            }
+        // const AS_FULL_PATH = (p: string) => {
+        //     p = vscode_helpers.toStringSafe(p);
+        //     if (!Path.isAbsolute(p)) {
+        //         p = Path.join(AWS_DIR, p);
+        //     }
 
-            return Path.resolve( p );
-        };
+        //     return Path.resolve( p );
+        // };
 
         let credentialClass: any;
         let credentialConfig: any;
@@ -375,17 +375,24 @@ export class S3FileSystem extends vscrw_fs.FileSystemBase {
             };
         }
 
+        const s3ConnectionPayload = {
+            apiVersion: api,
+            logger: logger,
+            credentials: new credentialClass(credentialConfig),
+            endpoint: endpoint,
+            params: {
+                Bucket: this.getBucket( uri ),
+                ACL: this.getDefaultAcl(),
+            },
+        }
+
+        if(endpoint && !endpoint.includes("amazonaws.com")){
+            s3ConnectionPayload['s3ForcePathStyle'] = true;
+            s3ConnectionPayload['signatureVersion'] = "v4"
+        }
+
         const S3: S3Connection = {
-            client: new AWS.S3({
-                apiVersion: api,
-                logger: logger,
-                credentials: new credentialClass(credentialConfig),
-                endpoint: endpoint,
-                params: {
-                    Bucket: this.getBucket( uri ),
-                    ACL: this.getDefaultAcl(),
-                },
-            }),
+            client: new AWS.S3(s3ConnectionPayload),
         };
 
         return S3;

@@ -340,7 +340,7 @@ URL Format: `s3://[credential_type@]bucket[/path/to/file/or/folder][?param1=valu
 ```json
 {
     "folders": [{
-        "uri": "s3://my-bucket/?acl=public-read",
+        "uri": "s3://my-bucket/?acl=public-read&endpoint=https://aws-s3-endpoint",
         "name": "My S3 Bucket"
     }]
 }
